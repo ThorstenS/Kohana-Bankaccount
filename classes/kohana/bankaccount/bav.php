@@ -118,4 +118,25 @@ class Kohana_Bankaccount_Bav extends Bankaccount {
         
         return true;
 	}
+	
+	/**
+	 * Install database, make sure user has permissions to create table
+	 * Only call this once, if you want to update your dataset, use update()
+	 *
+	 *     $bankaccount->install();
+	 */
+	public function install()
+	{
+        $this->bav->install();
+	}
+	
+	/**
+	 * Update database, make sure user has permissions to create table
+	 *
+	 *     $bankaccount->update();
+	 */
+	public function update()
+	{
+        $this->bav->update();
+	}
 }
