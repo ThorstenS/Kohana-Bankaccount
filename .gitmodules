@@ -1,0 +1,3 @@
+[submodule "vendor/bav"]
+	path = vendor/bav
+	url = git://github.com/malkusch/bav.git
