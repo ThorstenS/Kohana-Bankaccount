@@ -1,7 +1,6 @@
 <?php defined('SYSPATH') or die('No direct script access.');
 
-require_once( Kohana::find_file('vendor/bav/classes/autoloader', 'BAV_Autoloader') );
-BAV_Autoloader::add(Kohana::find_file('vendor/bav/classes/dataBackend', 'BAV_DataBackend_PDO'));
+require_once( Kohana::find_file('vendor/bav/autoloader', 'autoloader') );
 
 /**
  * Bankaccount module to validate German bank accounts
@@ -9,12 +8,12 @@ BAV_Autoloader::add(Kohana::find_file('vendor/bav/classes/dataBackend', 'BAV_Dat
  * @package    Bankaccount
  */
 class Kohana_Bankaccount_Bav extends Bankaccount {
-    
+
     /**
 	 * @var  object  bav instance
 	 */
     protected $bav;
-    
+
     /**
 	 * Returns a singleton instance of Bankaccount_BAV
 	 *
@@ -30,26 +29,26 @@ class Kohana_Bankaccount_Bav extends Bankaccount {
 			// Use the default instance name
 			$name = Bankaccount::$default_name;
 		}
-        
+
         if ( ! isset(Bankaccount::$instances[$driver][$name]))
 		{
             $db_group = Kohana::$config->load('bankaccount')->db_group;
             $db_config = Kohana::$config->load('database')->$db_group;
-            
+
 			$pdo = new PDO(
             'mysql:host='.$db_config['connection']['hostname'].
-            ';dbname=' . $db_config['connection']['database'], 
-            $db_config['connection']['username'], 
+            ';dbname=' . $db_config['connection']['database'],
+            $db_config['connection']['username'],
             $db_config['connection']['password']);
-            
+
             $pdo->exec("SET CHARACTER SET utf8");
-            
+
 			Bankaccount::$instances[$driver][$name] = new Kohana_Bankaccount_Bav(new BAV_DataBackend_PDO($pdo));
 		}
 
 		return Bankaccount::$instances[$driver][$name];
 	}
-	
+
 	/**
 	 * Creates a new BAV wrapper.
 	 *
@@ -59,7 +58,7 @@ class Kohana_Bankaccount_Bav extends Bankaccount {
 	{
 	   $this->bav = $bav;
 	}
-	
+
 	/**
 	 * Get the bank name based on bank code
 	 *
@@ -81,10 +80,10 @@ class Kohana_Bankaccount_Bav extends Bankaccount {
         {
             throw new Bankaccount_Exception($fail->getMessage());
         }
-        
+
         return $bank_name;
 	}
-	
+
 	/**
 	 * Validate an account numer
 	 *
@@ -101,11 +100,11 @@ class Kohana_Bankaccount_Bav extends Bankaccount {
         {
             return false;
         }
-        
+
         try
         {
             $bank = $this->bav->getBank($bankcode);
-            
+
             if ( ! $bank->isValid($accountnumber))
             {
                 return false;
@@ -115,10 +114,10 @@ class Kohana_Bankaccount_Bav extends Bankaccount {
         {
             return false;
         }
-        
+
         return true;
 	}
-	
+
 	/**
 	 * Install database, make sure user has permissions to create table
 	 * Only call this once, if you want to update your dataset, use update()
@@ -129,7 +128,7 @@ class Kohana_Bankaccount_Bav extends Bankaccount {
 	{
         $this->bav->install();
 	}
-	
+
 	/**
 	 * Update database, make sure user has permissions to create table
 	 *
