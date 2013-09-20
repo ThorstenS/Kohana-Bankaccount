@@ -14,49 +14,20 @@ class Kohana_Bankaccount_Bav extends Bankaccount {
 	 */
     protected $bav;
 
-    /**
-	 * Returns a singleton instance of Bankaccount_BAV
-	 *
-	 *     $bankaccount = Bankaccount::instance();
-	 *
-	 * @param   string  configuration group name
-	 * @return  Bankaccount
-	 */
-    public static function instance($driver = 'bav', $name = NULL)
+    public function __construct()
 	{
-		if ($name === NULL)
-		{
-			// Use the default instance name
-			$name = Bankaccount::$default_name;
-		}
+        $db_group = Kohana::$config->load('bankaccount')->db_group;
+        $db_config = Kohana::$config->load('database')->$db_group;
 
-        if ( ! isset(Bankaccount::$instances[$driver][$name]))
-		{
-            $db_group = Kohana::$config->load('bankaccount')->db_group;
-            $db_config = Kohana::$config->load('database')->$db_group;
+		$pdo = new PDO(
+        'mysql:host='.$db_config['connection']['hostname'].
+        ';dbname=' . $db_config['connection']['database'],
+        $db_config['connection']['username'],
+        $db_config['connection']['password']);
 
-			$pdo = new PDO(
-            'mysql:host='.$db_config['connection']['hostname'].
-            ';dbname=' . $db_config['connection']['database'],
-            $db_config['connection']['username'],
-            $db_config['connection']['password']);
+        $pdo->exec("SET CHARACTER SET utf8");
 
-            $pdo->exec("SET CHARACTER SET utf8");
-
-			Bankaccount::$instances[$driver][$name] = new Kohana_Bankaccount_Bav(new BAV_DataBackend_PDO($pdo));
-		}
-
-		return Bankaccount::$instances[$driver][$name];
-	}
-
-	/**
-	 * Creates a new BAV wrapper.
-	 *
-	 * @param   object  BAV_DataBackend_PDO
-	 */
-	public function __construct(BAV_DataBackend_PDO $bav)
-	{
-	   $this->bav = $bav;
+        $this->bav = new BAV_DataBackend_PDO($pdo);
 	}
 
 	/**

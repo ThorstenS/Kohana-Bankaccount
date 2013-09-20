@@ -6,17 +6,7 @@
  * @package    Bankaccount
  */
 abstract class Kohana_Bankaccount {
-    
-    /**
-	 * @var  string  default instance name
-	 */
-	public static $default_name = 'default';
 
-	/**
-	 * @var  array  Bankaccount class instances
-	 */
-	public static $instances = array();
-    
 	/**
 	 * Returns a singleton instance of Bankaccount
 	 *
@@ -25,21 +15,9 @@ abstract class Kohana_Bankaccount {
 	 * @param   string  configuration group name
 	 * @return  Bankaccount
 	 */
-	public static function instance($driver = 'bav', $name = NULL)
+	public static function factory($driver = 'bav')
 	{
-		if ($name === NULL)
-		{
-			// Use the default instance name
-			$name = Bankaccount::$default_name;
-		}
-        
-        if ( ! isset(Bankaccount::$instances[$driver][$name]))
-		{
-			$class = 'Bankaccount_' . ucfirst($driver);
-
-			Bankaccount::$instances[$driver][$name] = $class::instance($driver, $name);
-		}
-
-		return Bankaccount::$instances[$driver][$name];
+        $class = 'Bankaccount_' . ucfirst($driver);
+		return new $class;
 	}
 }
