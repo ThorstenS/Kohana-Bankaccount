@@ -34,6 +34,103 @@ class Kohana_Bankaccount_IBAN extends Bankaccount {
         'Z' => 35,
     );
 
+    /*
+     * Valid IBAN length recording to country code
+     */
+    protected $iban_length_by_country_code = array(
+        'AD' => 24,
+        'AE' => 23,
+        'AL' => 28,
+        'AT' => 20,
+        'AZ' => 28,
+        'BA' => 20,
+        'BE' => 16,
+        'BG' => 22,
+        'BH' => 22,
+        'BL' => 27,
+        'BR' => 29,
+        'CH' => 21,
+        'CR' => 21,
+        'CY' => 28,
+        'CZ' => 24,
+        'DE' => 22,
+        'DK' => 18,
+        'DO' => 28,
+        'EE' => 20,
+        'ES' => 24,
+        'FI' => 18,
+        'FO' => 18,
+        'FR' => 27,
+        'GB' => 22,
+        'GE' => 22,
+        'GF' => 27,
+        'GI' => 23,
+        'GL' => 18,
+        'GP' => 27,
+        'GR' => 27,
+        'GT' => 28,
+        'HK' => 16,
+        'HR' => 21,
+        'HU' => 28,
+        'IE' => 22,
+        'IL' => 23,
+        'IS' => 26,
+        'IT' => 27,
+        'KW' => 30,
+        'KZ' => 20,
+        'LB' => 28,
+        'LI' => 21,
+        'LT' => 20,
+        'LU' => 20,
+        'LV' => 21,
+        'MA' => 24,
+        'MC' => 27,
+        'MD' => 24,
+        'ME' => 22,
+        'MF' => 27,
+        'MK' => 19,
+        'MQ' => 27,
+        'MR' => 27,
+        'MT' => 31,
+        'MU' => 30,
+        'NC' => 27,
+        'NL' => 18,
+        'NO' => 15,
+        'PF' => 27,
+        'PK' => 24,
+        'PL' => 28,
+        'PM' => 27,
+        'PS' => 29,
+        'PT' => 25,
+        'RE' => 27,
+        'RO' => 24,
+        'RS' => 22,
+        'SA' => 24,
+        'SE' => 24,
+        'SI' => 19,
+        'SK' => 24,
+        'SM' => 27,
+        'TF' => 27,
+        'TN' => 24,
+        'TR' => 26,
+        'VG' => 24,
+        'WF' => 27,
+        'YT' => 27,
+    );
+
+    protected function iban_length_is_valid($iban)
+    {
+        $country_code = substr($iban, 0, 2);
+
+        // Hide error, if country isn't listed above, it's an invalid IBAN
+        if ($length = @$this->iban_length_by_country_code[ $country_code ])
+        {
+            return (bool) (strlen($iban) == $length);
+        }
+
+        return false;
+    }
+
     /**
      * Convert all letters to their numeric values
      *
@@ -118,6 +215,11 @@ class Kohana_Bankaccount_IBAN extends Bankaccount {
      */
     public function validate($iban)
     {
+        if ( ! $this->iban_length_is_valid($iban))
+        {
+            return false;
+        }
+
         $iban = $this->_prepare_iban($iban);
 
         $division_remainder = $this->_divide_by_97_helper($iban);
